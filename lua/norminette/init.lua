@@ -19,12 +19,20 @@ local function run_norminette()
 	local output = handle:read("*a")
 	handle:close()
 
-	-- Parse the output into Neovim diagnostics
-	local diagnostics = {}
+	-- Extract filename for comparison
 	local filename = vim.fn.fnamemodify(file, ":t") -- Extract the filename
-	if output:find(filename) then
-		print(filename .. " OK!")
+
+	-- Define a namespace specifically for norminette diagnostics
+	local norminette_ns = vim.api.nvim_create_namespace("norminette")
+
+	-- Check if the output indicates the file is clear
+	if output:match(filename .. " : OK!") then
+		print(filename .. " : OK!")
+		-- Clear only norminette diagnostics for the buffer
+		vim.diagnostic.set(norminette_ns, 0, {}) -- Clear diagnostics for the norminette namespace
 	else
+		-- Parse the output into Neovim diagnostics
+		local diagnostics = {}
 		for line in output:gmatch("[^\r\n]+") do
 			-- Extract line number, column, and message
 			local line_number, col, message =
@@ -38,12 +46,10 @@ local function run_norminette()
 				})
 			end
 		end
-	end
 
-	-- Ensure the namespace exists or create a new one
-	local namespace = vim.api.nvim_create_namespace("norminette")
-	-- Set the diagnostics in the current buffer
-	vim.diagnostic.set(namespace, 0, diagnostics) -- `0` for current buffer and namespace
+		-- Set the diagnostics in the norminette namespace
+		vim.diagnostic.set(norminette_ns, 0, diagnostics) -- `0` for current buffer and norminette namespace
+	end
 end
 
 -- Register the command

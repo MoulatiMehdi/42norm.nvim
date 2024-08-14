@@ -31,7 +31,7 @@ local function run_norminette()
 				line:match("Error:%s*([%w_]+)%s*%((line:%s*(%d+),%s*col:%s*(%d+))%):%s*(.*)")
 			if line_number and message then
 				table.insert(diagnostics, {
-					lnum = tonumber(col) - 1, -- Neovim uses 0-based indexing
+					lnum = tonumber(line_number) - 1, -- Neovim uses 0-based indexing
 					col = tonumber(col) - 1,
 					severity = vim.diagnostic.severity.ERROR,
 					message = message,
@@ -40,8 +40,10 @@ local function run_norminette()
 		end
 	end
 
+	-- Ensure the namespace exists or create a new one
+	local namespace = vim.api.nvim_create_namespace("norminette")
 	-- Set the diagnostics in the current buffer
-	vim.diagnostic.set(0, 0, diagnostics) -- `0` for current buffer and namespace
+	vim.diagnostic.set(namespace, 0, diagnostics) -- `0` for current buffer and namespace
 end
 
 -- Register the command

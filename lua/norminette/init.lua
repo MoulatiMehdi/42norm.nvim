@@ -1,13 +1,19 @@
--- lua/norminette/init.lua
-
+local M = {}
 local api = vim.api
 local diagnostic = vim.diagnostic
 
 -- Create a unique namespace for norminette diagnostics
 local namespace = api.nvim_create_namespace("norminette")
 
+-- Function to show a non-blocking notification
+local function show_notification(message, level)
+	vim.schedule_wrap(function()
+		vim.notify(message, level, { title = "Norminette" })
+	end)()
+end
+
 -- Function to run norminette and update diagnostics
-local function run_norminette()
+function M.norminette()
 	-- Get the current buffer's file name
 	local file = vim.fn.expand("%:p")
 
@@ -20,7 +26,7 @@ local function run_norminette()
 	-- Run norminette command
 	local handle = io.popen("norminette " .. file)
 	if not handle then
-		print("Failed to run norminette.")
+		show_notification("Failed to run norminette.", vim.log.levels.ERROR)
 		return
 	end
 
@@ -37,7 +43,10 @@ local function run_norminette()
 	if output:match(filename .. ": OK!") then
 		-- Clear only norminette diagnostics for the buffer
 		diagnostic.set(namespace, 0, {})
+		show_notification("Norminette: PASS!", vim.log.levels.INFO)
 	else
+		show_notification("Norminette: FAIL!", vim.log.levels.ERROR)
+
 		-- Parse the output into Neovim diagnostics
 		for line in output:gmatch("[^\r\n]+") do
 			-- Extract line number, column, and message
@@ -49,6 +58,13 @@ local function run_norminette()
 					severity = diagnostic.severity.ERROR,
 					message = message,
 				})
+			elseif message then
+				table.insert(diagnostics, {
+					lnum = 0,
+					col = 0,
+					severity = diagnostic.severity.ERROR,
+					message = line,
+				})
 			end
 		end
 
@@ -57,14 +73,4 @@ local function run_norminette()
 	end
 end
 
--- Register the command
-api.nvim_create_user_command("Norminette", run_norminette, { desc = "Run norminette and show errors in diagnostics" })
-
--- Run Norminette on text changes, insert mode changes, file save, and buffer enter
-api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
-	pattern = { "*.c", "*.h" },
-	callback = function()
-		run_norminette()
-	end,
-	desc = "Update Norminette diagnostics on text changes, file save, and file open",
-})
+return M

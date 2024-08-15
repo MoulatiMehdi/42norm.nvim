@@ -73,4 +73,16 @@ function M.norminette()
 	end
 end
 
+-- Optionally, set up autocommands
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
+	pattern = { "*.c", "*.h" },
+	callback = function()
+		M.norminette()
+	end,
+	desc = "show Norminette errors on file save, and file open",
+})
+
+-- Optionally, create a command to manually run Norminette
+vim.api.nvim_create_user_command("Norminette", M.norminette, { desc = "show Norminette errors in diagnostics" })
+
 return M

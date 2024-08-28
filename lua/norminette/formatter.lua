@@ -10,7 +10,12 @@ function M.formatter()
 	end
 
 	-- Run the formatter command directly on the temporary file
-	local cmd = "c_formatter_42 " .. temp_file
+	local cmd
+	if vim.fn.has("win32") == 1 then
+		cmd = "c_formatter_42 " .. temp_file .. " 2> NUL"
+	else
+		cmd = "c_formatter_42 " .. temp_file .. " 2> /dev/null"
+	end
 	local handle = io.popen(cmd)
 
 	-- Check if the handle was created successfully

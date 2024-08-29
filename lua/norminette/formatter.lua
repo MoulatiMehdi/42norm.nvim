@@ -46,7 +46,7 @@ function M.formatter()
 	formatted_file:close()
 
 	-- Split the content into lines and remove any trailing empty lines
-	local lines = vim.split(formatted_content, "\n", true)
+	local lines = vim.split(formatted_content, "\n")
 	if lines[#lines] == "" then
 		table.remove(lines, #lines)
 	end

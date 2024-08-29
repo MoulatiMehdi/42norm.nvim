@@ -21,11 +21,13 @@ function M.create_temp_file(buf)
 
 	-- Write content to the temporary file
 	fd:write(file_content)
-	-- Append EOF marker
-	-- fd:write("\n")
 	fd:close()
 
 	return temp_file
+end
+
+local function strip_color_codes(text)
+	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d;%dm", ""):gsub("\027%[%d;%d;%dm", "")
 end
 
 -- Function to run norminette on the file and return output and error
@@ -41,12 +43,9 @@ function M.run_norminette(temp_file)
 		return nil, "Error running norminette."
 	end
 
-	return output, nil
+	return strip_color_codes(output), nil
 end
 
 -- Function to strip color codes from the output
-function M.strip_color_codes(text)
-	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d;%dm", ""):gsub("\027%[%d;%d;%dm", "")
-end
 
 return M

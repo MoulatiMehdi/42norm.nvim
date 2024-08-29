@@ -37,9 +37,9 @@ function M.norminette()
 	-- Define a table to hold the diagnostics
 	local diagnostics = {}
 
-	-- Strip color codes from output
-	output = utils.strip_color_codes(output)
-
+	if output == nil then
+		return
+	end
 	-- Check if the output indicates the file is clear
 	if output:match("OK!") then
 		vim.notify("Norminette: PASS!", vim.log.levels.INFO)
@@ -47,7 +47,9 @@ function M.norminette()
 		vim.notify("Norminette: FAIL!", vim.log.levels.INFO)
 	end
 
+	-- Remove the first line
 	output = output:gsub("^[^\r\n]+[\n\r]", "")
+
 	-- Parse the output into Neovim diagnostics
 	for line in output:gmatch("[^\r\n]+") do
 		-- Trim the message

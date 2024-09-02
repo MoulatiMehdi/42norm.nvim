@@ -1,6 +1,16 @@
 local M = {}
 local api = vim.api
 
+-- Default configuration
+local config = {
+	timeout = 3000, -- Default timeout in milliseconds
+}
+
+-- Function to set up the plugin configuration
+function M.setup(user_config)
+	config = vim.tbl_deep_extend("force", config, user_config or {})
+end
+
 -- Function to create a temporary file with the same extension as the buffer's file or default to .c
 function M.create_temp_file(buf)
 	-- Get the buffer content
@@ -27,25 +37,80 @@ function M.create_temp_file(buf)
 end
 
 local function strip_color_codes(text)
-	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d;%dm", ""):gsub("\027%[%d;%d;%dm", "")
+	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d);%dm", ""):gsub("\027%[%d;%d;%dm", "")
 end
 
 -- Function to run norminette on the file and return output and error
-function M.run_norminette(temp_file)
-	local handle = io.popen("norminette " .. temp_file)
-	if not handle then
-		return nil, "Failed to run norminette."
-	end
-	local output = handle:read("*a")
-	local success, exit_code = handle:close()
-
-	if not success then
-		return nil, "Error running norminette."
-	end
-
-	return strip_color_codes(output), nil
-end
-
+--function M.run_norminette(temp_file)
+--	local handle = io.popen("norminette " .. temp_file)
+--	if not handle then
+--		return nil, "Failed to run norminette."
+--	end
+--	local output = handle:read("*a")
+--	local success, exit_code = handle:close()
+--
+--	if not success then
+--		return nil, "Error running norminette."
+--	end
+--
+--	return strip_color_codes(output), nil
+--end
+--
 -- Function to strip color codes from the output
+--
+
+-- Function to run norminette with a timeout
+function M.run_norminette(temp_file)
+	local command
+	if vim.fn.has("win32") == 1 then
+		command = "norminette " .. temp_file .. " 2> NUL"
+	else
+		command = "norminette " .. temp_file .. " 2> /dev/null "
+	end
+
+	local output = {}
+	local timed_out = false
+
+	-- Start the command as a job
+	local job_id = vim.fn.jobstart(command, {
+		on_stdout = function(_, data)
+			if data then
+				for _, line in ipairs(data) do
+					table.insert(output, line)
+				end
+			end
+		end,
+		on_stderr = function(_, data)
+			if data then
+				for _, line in ipairs(data) do
+					table.insert(output, line)
+				end
+			end
+		end,
+		on_exit = function(_, _)
+			if timed_out then
+				vim.notify("Norminette : Timed out (Make sure you didn't missed a ';').", vim.log.levels.ERROR)
+			end
+		end,
+	})
+
+	if not job_id then
+		return nil, "Failed to start norminette command."
+	end
+
+	-- Wait for the job to complete with a timeout
+	local job_result = vim.fn.jobwait({ job_id }, config.timeout)
+
+	-- Check the result of the job wait
+	if job_result[1] == -1 then
+		-- Job did not complete within the timeout
+		timed_out = true
+		vim.fn.jobstop(job_id) -- Stop the job
+		return nil
+	end
+
+	-- Join the output
+	return strip_color_codes(table.concat(output, "\n")), nil
+end
 
 return M

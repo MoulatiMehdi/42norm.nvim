@@ -40,25 +40,6 @@ local function strip_color_codes(text)
 	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d);%dm", ""):gsub("\027%[%d;%d;%dm", "")
 end
 
--- Function to run norminette on the file and return output and error
---function M.run_norminette(temp_file)
---	local handle = io.popen("norminette " .. temp_file)
---	if not handle then
---		return nil, "Failed to run norminette."
---	end
---	local output = handle:read("*a")
---	local success, exit_code = handle:close()
---
---	if not success then
---		return nil, "Error running norminette."
---	end
---
---	return strip_color_codes(output), nil
---end
---
--- Function to strip color codes from the output
---
-
 -- Function to run norminette with a timeout
 function M.run_norminette(temp_file)
 	local command

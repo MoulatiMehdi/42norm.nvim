@@ -1,9 +1,14 @@
 local M = {}
 local utils = require("norminette.utils")
 
-function M.formatter()
+function M.format()
 	-- Create a temporary file with the buffer content
-	local temp_file, err = utils.create_temp_file(vim.api.nvim_get_current_buf())
+	local buf = vim.api.nvim_get_current_buf()
+	local filetype = utils.get_extension(buf)
+	if filetype ~= "c" and filetype ~= "h" then
+		return
+	end
+	local temp_file, err = utils.create_temp_file(buf)
 	if not temp_file then
 		vim.notify("Failed to create temporary file: " .. err, vim.log.levels.ERROR)
 		return

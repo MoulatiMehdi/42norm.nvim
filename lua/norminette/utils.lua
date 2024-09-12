@@ -2,13 +2,10 @@ local M = {}
 local api = vim.api
 
 -- Default configuration
-local config = {
-	timeout = 3000, -- Default timeout in milliseconds
-}
+local config = require("norminette.config")
 
--- Function to set up the plugin configuration
-function M.setup(user_config)
-	config = vim.tbl_deep_extend("force", config, user_config or {})
+function M.get_extension(buf)
+	return api.nvim_buf_get_name(buf):match("%.([%a%d]+)$") or nil
 end
 
 -- Function to create a temporary file with the same extension as the buffer's file or default to .c
@@ -18,11 +15,10 @@ function M.create_temp_file(buf)
 	local file_content = table.concat(content, "\n") .. "\n"
 
 	-- Get the buffer's file name and extension
-	local file_name = api.nvim_buf_get_name(buf)
-	local file_ext = file_name:match("%.([%a%d]+)$") or "c" -- Default to .c if no extension found
+	local file_ext = ("." .. M.get_extension(buf)) or "" -- Default to .c if no extension found
 
 	-- Create a temporary file with the same extension as the buffer file or default to .c
-	local temp_file = vim.fn.tempname() .. "." .. file_ext
+	local temp_file = vim.fn.tempname() .. file_ext
 
 	local fd = io.open(temp_file, "w")
 	if not fd then
@@ -40,7 +36,6 @@ local function strip_color_codes(text)
 	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d);%dm", ""):gsub("\027%[%d;%d;%dm", "")
 end
 
--- Function to run norminette with a timeout
 function M.run_norminette(temp_file)
 	local command
 	if vim.fn.has("win32") == 1 then
@@ -80,7 +75,7 @@ function M.run_norminette(temp_file)
 	end
 
 	-- Wait for the job to complete with a timeout
-	local job_result = vim.fn.jobwait({ job_id }, config.timeout)
+	local job_result = vim.fn.jobwait({ job_id }, config.config.timeout)
 
 	-- Check the result of the job wait
 	if job_result[1] == -1 then

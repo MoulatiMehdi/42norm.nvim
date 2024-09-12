@@ -1,0 +1,18 @@
+local M = {}
+
+-- Default configuration
+M.config = {
+	timeout = 3000,
+	format_on_save = false,
+}
+
+-- Function to set user configuration
+function M.setup(user_config)
+	M.config = vim.tbl_deep_extend("force", M.config, user_config or {})
+end
+
+function M.get_config()
+	return M.config
+end
+
+return M

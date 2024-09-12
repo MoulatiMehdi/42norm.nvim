@@ -2,13 +2,16 @@
 vim.opt.runtimepath:append(".")
 
 -- Load the Norminette plugin
-local Norm = require("norminette")
+local norm = require("norminette")
 
+norm.setup({
+	format_on_save = true,
+})
 -- Example key mapping to run norminette manually
 vim.keymap.set("n", "<F5>", function()
-	Norm.norminette()
+	norm.norminette()
 end, { noremap = true, silent = true })
 
 vim.keymap.set("n", "<C-f>", function()
-	Norm.formatter()
+	norm.formatter()
 end, { noremap = true, silent = true })

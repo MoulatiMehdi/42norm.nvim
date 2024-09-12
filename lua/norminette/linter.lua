@@ -12,7 +12,7 @@ function M.norminette()
 	local buf = api.nvim_get_current_buf()
 
 	-- Check if the buffer's filetype is valid
-	local filetype = vim.bo[buf].filetype
+	local filetype = utils.get_extension(buf)
 	if filetype ~= "c" and filetype ~= "h" then
 		return
 	end
@@ -40,14 +40,7 @@ function M.norminette()
 	if output == nil then
 		return
 	end
-	-- Check if the output indicates the file is clear
-	if output:match("OK!") then
-		vim.notify("Norminette: PASS!", vim.log.levels.INFO)
-	else
-		vim.notify("Norminette: FAIL!", vim.log.levels.INFO)
-	end
 
-	-- Remove the first line
 	output = output:gsub("^[^\r\n]+[\n\r]", "")
 
 	-- Parse the output into Neovim diagnostics
@@ -82,7 +75,7 @@ function M.attach_to_buffer()
 	local buf = api.nvim_get_current_buf()
 
 	-- Check if the buffer's filetype is valid
-	local filetype = vim.bo[buf].filetype
+	local filetype = utils.get_extension(buf)
 	if filetype ~= "c" and filetype ~= "h" then
 		return
 	end
@@ -104,6 +97,6 @@ function M.attach_to_buffer()
 end
 
 return {
-	norminette = M.norminette,
+	check = M.norminette,
 	attach_to_buffer = M.attach_to_buffer,
 }

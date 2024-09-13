@@ -4,7 +4,10 @@ vim.opt.runtimepath:append(".")
 -- Load the Norminette plugin
 local norm = require("norminette")
 
-norm.setup({})
+norm.setup({
+	header_on_save = true,
+	format_on_save = true,
+})
 vim.keymap.set("n", "<F5>", function()
 	norm.check_norms()
 end, { desc = "Update 42norms diagnostics", noremap = true, silent = true })
@@ -19,10 +22,10 @@ end, { desc = "Insert 42header", noremap = true, silent = true })
 
 vim.api.nvim_create_user_command("Norminette", function()
 	norm.check_norms()
-end, { desc = "Update 42norms diagnostics" })
-
+end, {})
 vim.api.nvim_create_user_command("Format", function()
 	norm.format()
-end, { desc = "Format buffer on 42norms" })
-
-vim.api.nvim_create_user_command("Stdheader", norm.stdheader, { desc = "Insert 42header" })
+end, {})
+vim.api.nvim_create_user_command("Stdheader", function()
+	norm.stdheader()
+end, {})

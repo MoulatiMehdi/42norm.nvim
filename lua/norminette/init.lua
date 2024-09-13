@@ -1,15 +1,19 @@
 local linter = require("norminette.linter")
 local formatter = require("norminette.formatter")
 local config = require("norminette.config")
-
+local installer = require("norminette.install")
+local header = require("norminette.42header")
 local M = {}
 
-M.norminette = linter.check
-M.formatter = formatter.format
+M.check_norms = linter.check
+M.format = formatter.format
+M.stdheader = header.stdheader
+
 function M.setup(user_config)
 	-- 1. Merge user config with defaults
 	config.setup(user_config)
 
+	installer.ensure_tools_installed()
 	-- 2. Use configuration to conditionally set behavior
 	if config.config.format_on_save then
 		-- Set up autocommand for formatOnSave
@@ -17,6 +21,16 @@ function M.setup(user_config)
 			pattern = "*.c,*.h",
 			callback = function()
 				formatter.format()
+			end,
+		})
+	end
+
+	if config.config.header_on_save then
+		-- Set up autocommand for formatOnSave
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			pattern = "*.c,*.h",
+			callback = function()
+				header.stdheader()
 			end,
 		})
 	end
@@ -48,5 +62,10 @@ end, { desc = "Run Norminette on the whole file" })
 vim.api.nvim_create_user_command("Format", function()
 	formatter.format()
 end, { desc = "Format the current buffer using 42 norms" })
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+	pattern = "*",
+	callback = header.update,
+})
 
 return M

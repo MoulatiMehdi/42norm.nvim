@@ -1,8 +1,8 @@
 
 # nvim-norminette
-<div align="center">
-![Neovim](https://img.shields.io/badge/Neovim-%2301c4ff?logo=neovim&logoColor=white) ![Lua](https://img.shields.io/badge/Lua-%232c2c2c?logo=lua&logoColor=white)
-</div>
+
+![Neovim](https://img.shields.io/badge/Neovim-%2357A143?logo=neovim&logoColor=white) 
+![Lua](https://img.shields.io/badge/Lua-%232C2D72?logo=lua&logoColor=white)
 
 A Neovim plugin that integrates Norminette linter and `c_formatter_42` for formatting C code according to 42 school norms.
 

@@ -1,9 +1,9 @@
 local M = {}
-
 -- Default configuration
 M.config = {
 	timeout = 3000,
 	format_on_save = false,
+	header_on_save = false,
 }
 
 -- Function to set user configuration

@@ -4,8 +4,8 @@ local config = require("norminette.config")
 
 local M = {}
 
-M.norminette = linter.check
-M.formatter = formatter.format
+M.check_norms = linter.check
+M.format = formatter.format
 function M.setup(user_config)
 	-- 1. Merge user config with defaults
 	config.setup(user_config)
@@ -38,15 +38,5 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "BufEnter" }, {
 	end,
 	desc = "Run Norminette on buffer when exiting insert mode",
 })
-
--- User command to manually run Norminette on the whole file
-vim.api.nvim_create_user_command("Norminette", function()
-	linter.check()
-end, { desc = "Run Norminette on the whole file" })
-
--- User command to manually format the current buffer
-vim.api.nvim_create_user_command("Format", function()
-	formatter.format()
-end, { desc = "Format the current buffer using 42 norms" })
 
 return M

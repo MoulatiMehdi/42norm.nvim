@@ -8,6 +8,16 @@ function M.get_extension(buf)
 	return api.nvim_buf_get_name(buf):match("%.([%a%d]+)$") or nil
 end
 
+function M.command_exists(cmd)
+	local handle = io.popen("command -v " .. cmd .. " > /dev/null 2>&1 && echo 'true' || echo 'false'")
+	if not handle then
+		return nil
+	end
+
+	local result = handle:read("*a")
+	handle:close()
+	return result:match("true") ~= nil
+end
 -- Function to create a temporary file with the same extension as the buffer's file or default to .c
 function M.create_temp_file(buf)
 	-- Get the buffer content

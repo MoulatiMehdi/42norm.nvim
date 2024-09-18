@@ -7,9 +7,9 @@ local utils = require("norminette.utils")
 local namespace = api.nvim_create_namespace("norminette")
 
 -- Function to run norminette and update diagnostics
-function M.norminette()
+function M.norminette(filename)
 	-- Get the current buffer
-	local buf = api.nvim_get_current_buf()
+	local buf = filename or api.nvim_get_current_buf()
 
 	-- Check if the buffer's filetype is valid
 	local filetype = utils.get_extension(buf)
@@ -84,9 +84,9 @@ function M.attach_to_buffer()
 	api.nvim_buf_attach(buf, false, {
 		on_lines = function(_, _, _, _, _, _)
 			-- Only run Norminette when exiting insert mode
-			if vim.fn.mode() == "n" then
+			if vim.fn.mode() ~= "i" then
 				vim.schedule(function()
-					M.norminette()
+					M.norminette(buf)
 				end)
 			end
 		end,

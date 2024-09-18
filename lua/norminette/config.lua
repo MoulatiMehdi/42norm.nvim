@@ -4,6 +4,7 @@ M.config = {
 	timeout = 3000,
 	format_on_save = false,
 	header_on_save = false,
+	lint_on_change = true,
 }
 
 -- Function to set user configuration

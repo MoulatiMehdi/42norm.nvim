@@ -37,6 +37,7 @@ Install the plugin with your preferred package manager:
         norm.setup({
             header_on_save = true,
             format_on_save = true,
+            liner_on_change = true,
         })
 
         -- Press "F5" key to run the norminette
@@ -78,6 +79,7 @@ use {
         norm.setup({
             header_on_save = true,
             format_on_save = true,
+            linter_on_change = true,
         })
         -- Press "F5" key to run the norminette
         vim.keymap.set("n", "<F5>", function()
@@ -117,6 +119,7 @@ use {
     {
         format_on_save = false, -- format the code on save
         header_on_save = false, -- insert the header on save
+        linter_on_change = true, -- update diagnostic when the buffer changed (insert mode changed are ignored)
         timeout = 3000, -- timeout for norminette 
     }
 ```

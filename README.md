@@ -1,5 +1,5 @@
 
-# nvim-norminette
+# 42norm.nvim
 
 ![Neovim](https://img.shields.io/badge/Neovim-%2357A143?logo=neovim&logoColor=white) 
 ![Lua](https://img.shields.io/badge/Lua-%232C2D72?logo=lua&logoColor=white)
@@ -30,7 +30,7 @@ Install the plugin with your preferred package manager:
 
 ```lua
 {
-    "MoulatiMehdi/nvim-norminette",
+    "MoulatiMehdi/42norm.nvim",
     config = function()
         local norm = require("norminette")
 
@@ -72,7 +72,7 @@ Install the plugin with your preferred package manager:
 ```lua
 
 use {
-    "MoulatiMehdi/nvim-norminette",
+    "MoulatiMehdi/42norm.nvim",
     config = function()
         local norm = require("norminette")
 
@@ -113,7 +113,7 @@ use {
 
 ### Setup
 
-**nvim-norminette** is configurable. Please refer to the default settings below.
+**42norm.nvim** is configurable. Please refer to the default settings below.
 
 ```lua
     {

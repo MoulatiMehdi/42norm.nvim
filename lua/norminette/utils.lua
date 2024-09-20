@@ -24,13 +24,13 @@ function M.create_temp_file(buf)
 	local content = api.nvim_buf_get_lines(buf, 0, -1, false)
 	local file_content = table.concat(content, "\n") .. "\n"
 
-	-- Get the buffer's file name and extension
-	local file_ext = ("." .. M.get_extension(buf)) or "" -- Default to .c if no extension found
+	-- Get the filename without the path
+	local original_name = vim.fn.expand("%:t")
 
 	-- Create a temporary file with the same extension as the buffer file or default to .c
-	local temp_file = vim.fn.tempname() .. file_ext
+	local temp_file = vim.fn.tempname():gsub("[^/]*$", "") .. original_name
 
-	local fd = io.open(temp_file, "w")
+	local fd = io.open(temp_file, "wb")
 	if not fd then
 		error("Failed to open temporary file for writing.")
 	end

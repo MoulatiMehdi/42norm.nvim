@@ -1,8 +1,8 @@
 
-# nvim-norminette
-<div align="center">
-![Neovim](https://img.shields.io/badge/Neovim-%2301c4ff?logo=neovim&logoColor=white) ![Lua](https://img.shields.io/badge/Lua-%232c2c2c?logo=lua&logoColor=white)
-</div>
+# 42norm.nvim
+
+![Neovim](https://img.shields.io/badge/Neovim-%2357A143?logo=neovim&logoColor=white) 
+![Lua](https://img.shields.io/badge/Lua-%232C2D72?logo=lua&logoColor=white)
 
 A Neovim plugin that integrates Norminette linter and `c_formatter_42` for formatting C code according to 42 school norms.
 
@@ -30,13 +30,14 @@ Install the plugin with your preferred package manager:
 
 ```lua
 {
-    "MoulatiMehdi/nvim-norminette",
+    "MoulatiMehdi/42norm.nvim",
     config = function()
         local norm = require("norminette")
 
         norm.setup({
             header_on_save = true,
             format_on_save = true,
+            liner_on_change = true,
         })
 
         -- Press "F5" key to run the norminette
@@ -71,13 +72,14 @@ Install the plugin with your preferred package manager:
 ```lua
 
 use {
-    "MoulatiMehdi/nvim-norminette",
+    "MoulatiMehdi/42norm.nvim",
     config = function()
         local norm = require("norminette")
 
         norm.setup({
             header_on_save = true,
             format_on_save = true,
+            linter_on_change = true,
         })
         -- Press "F5" key to run the norminette
         vim.keymap.set("n", "<F5>", function()
@@ -111,12 +113,13 @@ use {
 
 ### Setup
 
-**nvim-norminette** is configurable. Please refer to the default settings below.
+**42norm.nvim** is configurable. Please refer to the default settings below.
 
 ```lua
     {
         format_on_save = false, -- format the code on save
         header_on_save = false, -- insert the header on save
+        linter_on_change = true, -- update diagnostic when the buffer changed (insert mode changed are ignored)
         timeout = 3000, -- timeout for norminette 
     }
 ```

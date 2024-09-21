@@ -2,7 +2,7 @@
 vim.opt.runtimepath:append(".")
 
 -- Load the Norminette plugin
-local norm = require("norminette")
+local norm = require("42norm")
 
 norm.setup({
 	header_on_save = true,

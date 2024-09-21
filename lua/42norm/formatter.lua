@@ -1,5 +1,5 @@
 local M = {}
-local utils = require("norminette.utils")
+local utils = require("42norm.utils")
 
 function M.format()
 	-- Create a temporary file with the buffer content

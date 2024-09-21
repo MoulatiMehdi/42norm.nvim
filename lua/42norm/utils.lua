@@ -2,7 +2,7 @@ local M = {}
 local api = vim.api
 
 -- Default configuration
-local config = require("norminette.config")
+local config = require("42norm.config")
 
 function M.get_extension(buf)
 	return api.nvim_buf_get_name(buf):match("%.([%a%d]+)$") or nil

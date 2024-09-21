@@ -32,7 +32,7 @@ Install the plugin with your preferred package manager:
 {
     "MoulatiMehdi/42norm.nvim",
     config = function()
-        local norm = require("norminette")
+        local norm = require("42norm")
 
         norm.setup({
             header_on_save = true,
@@ -74,7 +74,7 @@ Install the plugin with your preferred package manager:
 use {
     "MoulatiMehdi/42norm.nvim",
     config = function()
-        local norm = require("norminette")
+        local norm = require("42norm")
 
         norm.setup({
             header_on_save = true,

@@ -1,8 +1,8 @@
-local linter = require("norminette.linter")
-local formatter = require("norminette.formatter")
-local config = require("norminette.config")
-local installer = require("norminette.install")
-local header = require("norminette.42header")
+local linter = require("42norm.linter")
+local formatter = require("42norm.formatter")
+local config = require("42norm.config")
+local installer = require("42norm.install")
+local header = require("42norm.42header")
 local M = {}
 
 M.check_norms = linter.check

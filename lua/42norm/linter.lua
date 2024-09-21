@@ -1,7 +1,7 @@
 local M = {}
 local api = vim.api
 local diagnostic = vim.diagnostic
-local utils = require("norminette.utils")
+local utils = require("42norm.utils")
 
 -- Create a unique namespace for norminette diagnostics
 local namespace = api.nvim_create_namespace("norminette")

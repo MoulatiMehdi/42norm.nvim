@@ -41,6 +41,7 @@ function M.setup(user_config)
 			pattern = { "*.c", "*.h" },
 			callback = function()
 				linter.attach_to_buffer()
+				linter.check()
 			end,
 			desc = "Attach Norminette to buffer on BufEnter",
 		})
@@ -54,15 +55,6 @@ function M.setup(user_config)
 		})
 	end
 end
-
--- Autocommand to run Norminette when exiting insert mode
-vim.api.nvim_create_autocmd({ "BufEnter" }, {
-	pattern = { "*.c", "*.h" },
-	callback = function()
-		linter.check()
-	end,
-	desc = "Run Norminette on buffer when exiting insert mode",
-})
 
 vim.api.nvim_create_autocmd("BufWritePre", {
 	pattern = "*",

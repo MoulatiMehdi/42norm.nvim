@@ -6,7 +6,7 @@ local norm = require("42norm")
 
 norm.setup({
 	header_on_save = true,
-	format_on_save = true,
+	format_on_save = false,
 	lint_on_change = true,
 })
 vim.keymap.set("n", "<F5>", function()

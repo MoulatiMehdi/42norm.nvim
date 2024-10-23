@@ -41,11 +41,8 @@ function M.norminette(filename)
 		return
 	end
 
-	print(output:gsub("\n", "_"))
-	print(temp_file)
 	output = output:gsub("^\n?[^\n]+[\n]?", "")
 
-	print(output)
 	-- Parse the output into Neovim diagnostics
 	for line in output:gmatch("[^\r\n]+") do
 		-- Trim the message

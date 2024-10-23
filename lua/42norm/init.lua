@@ -18,7 +18,7 @@ function M.setup(user_config)
 	if config.config.format_on_save then
 		-- Set up autocommand for formatOnSave
 		vim.api.nvim_create_autocmd("BufWritePre", {
-			pattern = "*.c,*.h",
+			pattern = { "*.c", "*.h" },
 			callback = function()
 				formatter.format()
 			end,
@@ -28,7 +28,7 @@ function M.setup(user_config)
 	if config.config.header_on_save then
 		-- Set up autocommand for formatOnSave
 		vim.api.nvim_create_autocmd("BufWritePre", {
-			pattern = "*.c,*.h",
+			pattern = { "*.c", "*.h" },
 			callback = function()
 				header.stdheader()
 			end,

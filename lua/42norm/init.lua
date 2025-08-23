@@ -1,7 +1,6 @@
 local linter = require("42norm.linter")
 local formatter = require("42norm.formatter")
 local config = require("42norm.config")
-local installer = require("42norm.install")
 local header = require("42norm.42header")
 local M = {}
 
@@ -13,7 +12,6 @@ function M.setup(user_config)
 	-- 1. Merge user config with defaults
 	config.setup(user_config)
 
-	installer.ensure_tools_installed()
 	-- 2. Use configuration to conditionally set behavior
 	if config.config.format_on_save then
 		-- Set up autocommand for formatOnSave

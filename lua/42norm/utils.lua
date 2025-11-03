@@ -46,57 +46,71 @@ local function strip_color_codes(text)
 	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d);%dm", ""):gsub("\027%[%d;%d;%dm", "")
 end
 
-function M.run_norminette(temp_file)
-	local command
-	if vim.fn.has("win32") == 1 then
-		command = "norminette " .. temp_file .. " 2> NUL"
-	else
-		command = "norminette " .. temp_file .. " 2> /dev/null "
-	end
+function M.run_norminette(temp_file, on_complete)
+    local command
+    if vim.fn.has("win32") == 1 then
+        command = "norminette " .. temp_file .. " 2> NUL"
+    else
+        command = "norminette " .. temp_file .. " 2> /dev/null "
+    end
 
-	local output = {}
-	local timed_out = false
+    local output = {}
+    local timed_out = false
+    local job_id
 
-	-- Start the command as a job
-	local job_id = vim.fn.jobstart(command, {
-		on_stdout = function(_, data)
-			if data then
-				for _, line in ipairs(data) do
-					table.insert(output, line)
-				end
-			end
-		end,
-		on_stderr = function(_, data)
-			if data then
-				for _, line in ipairs(data) do
-					table.insert(output, line)
-				end
-			end
-		end,
-		on_exit = function(_, _)
-			if timed_out then
-				vim.notify("Norminette : Timed out (Make sure you didn't missed a ';').", vim.log.levels.ERROR)
-			end
-		end,
-	})
+    -- Create a timer to enforce timeout without blocking UI
+    local timer = vim.loop.new_timer()
 
-	if not job_id then
-		return nil, "Failed to start norminette command."
-	end
+    local function finish(result, err)
+        -- Ensure callback executes on main loop
+        vim.schedule(function()
+            if timer and not timer:is_closing() then
+                timer:stop()
+                timer:close()
+            end
+            if timed_out and not err then
+                err = "Timed out"
+            end
+            if on_complete then
+                on_complete(result and strip_color_codes(result) or nil, err)
+            end
+        end)
+    end
 
-	-- Wait for the job to complete with a timeout
-	local job_result = vim.fn.jobwait({ job_id }, config.config.timeout)
+    job_id = vim.fn.jobstart(command, {
+        on_stdout = function(_, data)
+            if data then
+                for _, line in ipairs(data) do
+                    table.insert(output, line)
+                end
+            end
+        end,
+        on_stderr = function(_, data)
+            if data then
+                for _, line in ipairs(data) do
+                    table.insert(output, line)
+                end
+            end
+        end,
+        on_exit = function(_, _)
+            if timed_out then
+                return
+            end
+            finish(table.concat(output, "\n"), nil)
+        end,
+    })
 
-	-- Check the result of the job wait
-	if job_result[1] == -1 then
-		-- Job did not complete within the timeout
-		timed_out = true
-		vim.fn.jobstop(job_id) -- Stop the job
-		return nil
-	end
+    if not job_id or job_id <= 0 then
+        finish(nil, "Failed to start norminette command.")
+        return
+    end
 
-	-- Join the output
-	return strip_color_codes(table.concat(output, "\n")), nil
+    -- Start timeout timer
+    timer:start(config.config.timeout, 0, function()
+        timed_out = true
+        pcall(vim.fn.jobstop, job_id)
+        finish(nil, "timeout")
+    end)
 end
 
 return M

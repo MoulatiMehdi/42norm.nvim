@@ -1,6 +1,7 @@
 local M = {}
 local api = vim.api
 local diagnostic = vim.diagnostic
+local config = require("42norm.config")
 local utils = require("42norm.utils")
 
 -- Create a unique namespace for norminette diagnostics
@@ -8,6 +9,25 @@ local namespace = api.nvim_create_namespace("norminette")
 
 -- Track running checks per buffer to avoid overlap
 local running_checks_by_buf = {}
+
+local function is_ignored(buf)
+	local cfg = config.get_config()
+	local ignore_list = cfg.ignore or {}
+	local name = api.nvim_buf_get_name(buf)
+	if not name or name == "" then
+		return false
+	end
+	local basename = name:match("([^/\\]+)$")
+	if not basename then
+		return false
+	end
+	for _, ignored in ipairs(ignore_list) do
+		if basename == ignored then
+			return true
+		end
+	end
+	return false
+end
 
 -- Function to run norminette and update diagnostics
 function M.norminette(filename)
@@ -17,6 +37,10 @@ function M.norminette(filename)
 	-- Check if the buffer's filetype is valid
 	local filetype = utils.get_extension(buf)
 	if filetype ~= "c" and filetype ~= "h" then
+		return
+	end
+
+	if is_ignored(buf) then
 		return
 	end
 
@@ -81,6 +105,10 @@ function M.attach_to_buffer()
 	-- Check if the buffer's filetype is valid
 	local filetype = utils.get_extension(buf)
 	if filetype ~= "c" and filetype ~= "h" then
+		return
+	end
+
+	if is_ignored(buf) then
 		return
 	end
 

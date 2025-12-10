@@ -19,7 +19,7 @@ A Neovim plugin that integrates Norminette linter and `c_formatter_42` for forma
 - **Python 3.8+** : Ensure you have Python 3.8 or higher installed to run c_formatter_42.
 
 ## 📝 Note : 
-the plugin will try to install these commands. if it fails please install them before using the plugin:
+please install these commands before using the plugin:
 
 - [c_formatter_42](https://github.com/dawnbeen/c_formatter_42) 
 - [norminette](https://github.com/42School/norminette)

@@ -5,6 +5,7 @@ M.config = {
 	format_on_save = false,
 	header_on_save = false,
 	lint_on_change = true,
+	ignore = {},
 }
 
 -- Function to set user configuration

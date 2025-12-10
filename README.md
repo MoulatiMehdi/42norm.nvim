@@ -121,6 +121,7 @@ use {
         header_on_save = false, -- insert the header on save
         linter_on_change = true, -- update diagnostic when the buffer changed (insert mode changed are ignored)
         timeout = 3000, -- timeout for norminette 
+        ignore = {}, -- list of filenames to skip when running norminette
     }
 ```
 

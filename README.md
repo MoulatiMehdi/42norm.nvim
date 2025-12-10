@@ -127,4 +127,5 @@ use {
 
 ## 🤝 Contributing
 
+Special thanks to all contributors for their continuous support and contributions.
 Feel free to submit issues or pull requests to improve the plugin.

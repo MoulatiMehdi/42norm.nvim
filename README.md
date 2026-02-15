@@ -125,6 +125,10 @@ use {
     }
 ```
 
+**Globals:**
+- HEADER username:  `vim.g.user42` or `USER`
+- HEADER mail:      `vim.g.mail42` or `MAIL`
+
 ## 🤝 Contributing
 
 Special thanks to all contributors for their continuous support and contributions.

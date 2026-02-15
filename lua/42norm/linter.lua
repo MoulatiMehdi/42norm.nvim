@@ -80,18 +80,20 @@ function M.norminette(filename)
 		for line in output:gmatch("[^\r\n]+") do
 			local trim_str = line:gsub("^%s*", "")
 			local line_number, col, message = trim_str:match("line:%s*(%d+),%s*col:%s*(%d+)%):%s*(.*)")
-			local severity
-			if line:match("^Notice:") then
-				severity = diagnostic.severity.WARN
-			else
-				severity = diagnostic.severity.ERROR
+			if line_number then
+				local severity
+				if line:match("^Notice:") then
+					severity = diagnostic.severity.WARN
+				else
+					severity = diagnostic.severity.ERROR
+				end
+				table.insert(diagnostics, {
+					lnum = tonumber(line_number or "1") - 1,
+					col = tonumber(col or "1") - 1,
+					severity = severity,
+					message = message or trim_str,
+				})
 			end
-			table.insert(diagnostics, {
-				lnum = tonumber(line_number or "1") - 1,
-				col = tonumber(col or "1") - 1,
-				severity = severity,
-				message = message or trim_str,
-			})
 		end
 
 		diagnostic.set(namespace, buf, diagnostics, { virtual_text = true })

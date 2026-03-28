@@ -17,6 +17,7 @@ A Neovim plugin that integrates Norminette linter and `c_formatter_42` for forma
 - **Neovim** : Ensure Neovim is installed on your system.
 - **Lua** : The plugin requires Lua to be available in Neovim.
 - **Python 3.8+** : Ensure you have Python 3.8 or higher installed to run c_formatter_42.
+- **c_formatter_42** command  (make an alias to the c_formatter_42 python package)
 
 ## 📝 Note : 
 please install these commands before using the plugin:

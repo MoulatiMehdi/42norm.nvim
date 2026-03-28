@@ -15,7 +15,7 @@ function M.format()
 	end
 
 	-- Run the formatter command directly on the temporary file
-	local cmd = "python3 -m c_formatter_42 "
+	local cmd = "c_formatter_42 "
 	if vim.fn.has("win32") == 1 then
 		cmd = cmd .. temp_file .. " 2> NUL"
 	else

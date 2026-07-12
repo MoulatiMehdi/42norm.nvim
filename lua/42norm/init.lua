@@ -18,7 +18,7 @@ function M.setup(user_config)
 		vim.api.nvim_create_autocmd("BufWritePre", {
 			pattern = { "*.c", "*.h" },
 			callback = function()
-				formatter.format()
+				formatter.format("c_formatter_42")
 			end,
 		})
 	end

@@ -1,31 +1,28 @@
 local M = {}
 local utils = require("42norm.utils")
 
-function M.format()
+function M.format(formatter_cmd)
 	-- Create a temporary file with the buffer content
 	local buf = vim.api.nvim_get_current_buf()
-	local filetype = utils.get_extension(buf)
-	if filetype ~= "c" and filetype ~= "h" then
-		return
-	end
 	local temp_file, err = utils.create_temp_file(buf)
 	if not temp_file then
 		vim.notify("Failed to create temporary file: " .. err, vim.log.levels.ERROR)
 		return
 	end
 
+    local cmd
+
 	-- Run the formatter command directly on the temporary file
-	local cmd = "c_formatter_42 "
 	if vim.fn.has("win32") == 1 then
-		cmd = cmd .. temp_file .. " 2> NUL"
+		cmd = formatter_cmd ..  temp_file .. " 2> NUL"
 	else
-		cmd = cmd .. temp_file .. " 2> /dev/null"
+		cmd = formatter_cmd .. temp_file .. " 2> /dev/null"
 	end
 	local handle = io.popen(cmd)
 
 	-- Check if the handle was created successfully
 	if not handle then
-		vim.notify("Failed to execute the formatter command.", vim.log.levels.ERROR)
+		vim.notify("Failed to execute `" .. cmd .. "` command.", vim.log.levels.ERROR)
 		os.remove(temp_file)
 		return
 	end
@@ -33,7 +30,7 @@ function M.format()
 	-- Close the handle and check for success
 	local success = handle:close()
 	if not success then
-		vim.notify("Failed to format the code. Please ensure that c_formatter_42 is installed.", vim.log.levels.ERROR)
+		vim.notify("Failed to format the code. Please ensure that `" .. cmd .. "` is installed.", vim.log.levels.ERROR)
 		os.remove(temp_file)
 		return
 	end
@@ -61,6 +58,7 @@ function M.format()
 
 	-- Delete the temporary file
 	os.remove(temp_file)
+    vim.bo.modified = false
 end
 
 return M

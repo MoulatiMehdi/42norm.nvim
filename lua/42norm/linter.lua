@@ -1,11 +1,8 @@
 local M = {}
 local api = vim.api
-local diagnostic = vim.diagnostic
 local config = require("42norm.config")
 local utils = require("42norm.utils")
-
--- Create a unique namespace for norminette diagnostics
-local namespace = api.nvim_create_namespace("norminette")
+local linter_handlers = require("42norm.handlers.c_handler")
 
 -- Track running checks per buffer to avoid overlap
 local running_checks_by_buf = {}
@@ -30,15 +27,9 @@ local function is_ignored(buf)
 end
 
 -- Function to run norminette and update diagnostics
-function M.norminette(filename)
+function M.norminette(filename, linter, linter_handler)
 	-- Get the current buffer
 	local buf = filename or api.nvim_get_current_buf()
-
-	-- Check if the buffer's filetype is valid
-	local filetype = utils.get_extension(buf)
-	if filetype ~= "c" and filetype ~= "h" then
-		return
-	end
 
 	if is_ignored(buf) then
 		return
@@ -59,44 +50,14 @@ function M.norminette(filename)
 	end
 
 	-- Run norminette asynchronously on the temporary file
-	utils.run_norminette(temp_file, function(output, run_err)
+	utils.lint(temp_file, linter, function(output, run_err)
 		pcall(os.remove, temp_file)
 		running_checks_by_buf[buf] = nil
+		local diagnostics = linter_handler(output, run_err)
 
-		if run_err == "timeout" then
-			vim.notify("Norminette: Timed out (check for missing ';').", vim.log.levels.ERROR)
-			return
-		elseif run_err then
-			vim.notify(run_err, vim.log.levels.ERROR)
-			return
-		end
-
-		if output == nil then
-			return
-		end
-
-		local diagnostics = {}
-		output = output:gsub("^\n?[^\n]+[\n]?", "")
-		for line in output:gmatch("[^\r\n]+") do
-			local trim_str = line:gsub("^%s*", "")
-			local line_number, col, message = trim_str:match("line:%s*(%d+),%s*col:%s*(%d+)%):%s*(.*)")
-			if line_number then
-				local severity
-				if line:match("^Notice:") then
-					severity = diagnostic.severity.WARN
-				else
-					severity = diagnostic.severity.ERROR
-				end
-				table.insert(diagnostics, {
-					lnum = tonumber(line_number or "1") - 1,
-					col = tonumber(col or "1") - 1,
-					severity = severity,
-					message = message or trim_str,
-				})
-			end
-		end
-
-		diagnostic.set(namespace, buf, diagnostics, { virtual_text = true })
+		-- Create a unique namespace for norminette diagnostics
+		local namespace = vim.api.nvim_create_namespace(linter)
+		vim.diagnostic.set(namespace, buf, diagnostics or {}, { virtual_text = true })
 	end)
 end
 
@@ -105,10 +66,6 @@ function M.attach_to_buffer()
 	local buf = api.nvim_get_current_buf()
 
 	-- Check if the buffer's filetype is valid
-	local filetype = utils.get_extension(buf)
-	if filetype ~= "c" and filetype ~= "h" then
-		return
-	end
 
 	if is_ignored(buf) then
 		return
@@ -120,7 +77,10 @@ function M.attach_to_buffer()
 			-- Only run Norminette when exiting insert mode
 			if vim.fn.mode() ~= "i" then
 				vim.schedule(function()
-					M.norminette(buf)
+					local filetype = utils.get_extension(buf)
+					if filetype ~= "c" and filetype ~= "h" then
+						M.norminette(buf, "norminette", linter_handlers.handle_c())
+					end
 				end)
 			end
 		end,

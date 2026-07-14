@@ -1,14 +1,13 @@
 local M = {}
+local linter = require("42norm.linter")
+local formatter = require("42norm.formatter")
+local utils = require("42norm.utils")
 
-local function strip_color_codes(text)
-	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d);%dm", ""):gsub("\027%[%d;%d;%dm", "")
-end
-
-function M.handle_c(output, run_err)
-	output = strip_color_codes(output)
+local function on_complete(output, run_err)
+	output = utils.strip_color_codes(output)
 
 	if run_err == "timeout" then
-		vim.notify("Norminette: Timed out (check for missing ';').", vim.log.levels.ERROR)
+		vim.notify("Linter Timed out.", vim.log.levels.ERROR)
 		return
 	elseif run_err then
 		vim.notify(run_err, vim.log.levels.ERROR)
@@ -41,6 +40,14 @@ function M.handle_c(output, run_err)
 	end
 
 	return diagnostics
+end
+
+function M.lint()
+	linter.lint("norminette", on_complete)
+end
+
+function M.format()
+	formatter.format("c_formatter_42")
 end
 
 return M

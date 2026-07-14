@@ -8,6 +8,22 @@ function M.get_extension(buf)
 	return api.nvim_buf_get_name(buf):match("%.([%a%d]+)$") or nil
 end
 
+function M.strip_color_codes(text)
+	return text:gsub("\027%[%d+m", ""):gsub("\027%[%d);%dm", ""):gsub("\027%[%d;%d;%dm", "")
+end
+
+function M.resolve_filetype(buf)
+	local filetype = vim.bo[buf].filetype
+	local ext = M.get_extension(buf)
+
+	-- nvim considers .h files as filetype "cpp" by default, so we need to handle that case
+	if ext == "c" or ext == "h" then
+		return "c"
+	end
+
+	return filetype
+end
+
 -- Function to create a temporary file with the same extension as the buffer's file or default to .c
 function M.create_temp_file(buf)
 	-- Get the buffer content
@@ -42,7 +58,7 @@ function M.lint(temp_file, linter_cmd, on_complete)
 	end
 
 	local output = {}
-	local is_timedout = false
+	local is_timeout = false
 	local job_id
 
 	-- Create a timer to enforce timeout without blocking UI
@@ -55,7 +71,7 @@ function M.lint(temp_file, linter_cmd, on_complete)
 				timer:stop()
 				timer:close()
 			end
-			if is_timedout and not err then
+			if is_timeout and not err then
 				err = "Timed out"
 			end
 			if on_complete then
@@ -80,7 +96,7 @@ function M.lint(temp_file, linter_cmd, on_complete)
 			end
 		end,
 		on_exit = function(_, _)
-			if is_timedout then
+			if is_timeout then
 				return
 			end
 			finish(table.concat(output, "\n"), nil)
@@ -94,7 +110,7 @@ function M.lint(temp_file, linter_cmd, on_complete)
 
 	-- Start timeout timer
 	timer:start(config.config.timeout, 0, function()
-		is_timedout = true
+		is_timeout = true
 		pcall(vim.fn.jobstop, job_id)
 		finish(nil, "timeout")
 	end)

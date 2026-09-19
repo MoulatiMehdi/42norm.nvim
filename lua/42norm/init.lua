@@ -1,5 +1,6 @@
 local config = require("42norm.config")
 local header = require("42norm.header")
+local header_filetypes = { c = true, cpp = true }
 local handlers = require("42norm.handlers")
 local utils = require("42norm.utils")
 local linter = require("42norm.linter")
@@ -91,7 +92,10 @@ function M.setup(user_config)
 	if config.config.header_on_save then
 		vim.api.nvim_create_autocmd("BufWritePre", {
 			callback = function()
-				header.stdheader()
+				local filetype = utils.resolve_filetype(vim.api.nvim_get_current_buf())
+				if header_filetypes[filetype] then
+					header.stdheader()
+				end
 			end,
 		})
 	end
@@ -116,7 +120,7 @@ function M.setup(user_config)
 end
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-	pattern = "*",
+	pattern = {"*.c", "*.h", "*.cpp", "*.hpp"},
 	callback = header.update,
 })
 
